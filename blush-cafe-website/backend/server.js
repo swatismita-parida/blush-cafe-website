@@ -2,142 +2,79 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
+
+const Reservation = require('../src/models/Reservation');
 
 dotenv.config();
 
 const app = express();
 
-// ===== MIDDLEWARE =====
 app.use(cors({
-    origin: ['http://localhost:5500', 'https://wondrous-tartufo-155cbc.netlify.app'],
+    origin: ['http://localhost:5500', 'https://wondrous-tartufo-155cbc.netlify.app', 'https://blushcafe-swatismitaparida-fa740d.netlify.app'],
     credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ===== MONGODB CONNECTION =====
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
 .then(() => console.log('✅ MongoDB Connected Successfully!'))
-.catch((err) => console.error('❌ MongoDB Error:', err.message));
+.catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
-// ===== MODELS =====
-const Reservation = require('./src/models/Reservation');
-const Contact = require('./src/models/Contact');
+// Email transporter (used to send a confirmation email after a reservation is saved)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
-// ===== TEST ROUTE =====
 app.get('/api/test', (req, res) => {
     res.json({ message: '✅ Blush Cafe API is working!' });
 });
 
-// ===== RESERVATION ROUTES =====
-
 // Create a new reservation
 app.post('/api/reservations', async (req, res) => {
     try {
-        const { name, email, phone, date, time, people, specialRequests } = req.body;
-
-        // Check if slot is already booked
-        const existing = await Reservation.findOne({
-            date: new Date(date),
-            time: time,
-            status: { $ne: 'cancelled' }
-        });
-
-        if (existing) {
-            return res.status(409).json({
-                success: false,
-                message: 'This time slot is already booked. Please choose another time.'
-            });
-        }
-
-        const reservation = new Reservation({
-            name,
-            email,
-            phone,
-            date,
-            time,
-            people,
-            specialRequests
-        });
-
+        const reservation = new Reservation(req.body);
         await reservation.save();
 
-        res.status(201).json({
-            success: true,
-            message: '✅ Reservation created successfully!',
-            data: {
-                id: reservation._id,
-                name: reservation.name,
-                date: reservation.date,
-                time: reservation.time,
-                people: reservation.people
-            }
-        });
+        // Send confirmation email — failure to send email should not fail the reservation
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: reservation.email,
+                subject: 'Your Blush Cafe Reservation is Confirmed',
+                text: `Hi ${reservation.name},\n\nYour table for ${reservation.people} on ${new Date(reservation.date).toDateString()} at ${reservation.time} is booked.\n\nSee you soon at Blush Cafe!`
+            }).catch((err) => console.error('⚠️ Email send failed:', err.message));
+        }
 
+        res.status(201).json({ message: '✅ Reservation created successfully', reservation });
     } catch (err) {
         if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(e => e.message);
-            return res.status(400).json({ success: false, message: 'Validation failed', errors: messages });
+            const messages = Object.values(err.errors).map((e) => e.message);
+            return res.status(400).json({ message: 'Validation failed', errors: messages });
         }
-        console.error('❌ Reservation error:', err.message);
-        res.status(500).json({ success: false, message: 'Something went wrong' });
+        console.error('❌ Reservation creation error:', err.message);
+        res.status(500).json({ message: 'Something went wrong while creating the reservation' });
     }
 });
 
-// Get all reservations (Admin)
+// Get all reservations (useful for an admin view)
 app.get('/api/reservations', async (req, res) => {
     try {
         const reservations = await Reservation.find().sort({ createdAt: -1 });
-        res.json({ success: true, count: reservations.length, data: reservations });
+        res.json(reservations);
     } catch (err) {
-        console.error('❌ Fetch error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to fetch reservations' });
+        console.error('❌ Fetch reservations error:', err.message);
+        res.status(500).json({ message: 'Something went wrong while fetching reservations' });
     }
 });
 
-// ===== CONTACT ROUTES =====
-
-// Create a contact message
-app.post('/api/contact', async (req, res) => {
-    try {
-        const { name, email, subject, message } = req.body;
-
-        const contact = new Contact({
-            name,
-            email,
-            subject: subject || 'General Inquiry',
-            message
-        });
-
-        await contact.save();
-
-        res.status(201).json({
-            success: true,
-            message: '✅ Message sent successfully! We will get back to you soon.'
-        });
-
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            const messages = Object.values(err.errors).map(e => e.message);
-            return res.status(400).json({ success: false, message: 'Validation failed', errors: messages });
-        }
-        console.error('❌ Contact error:', err.message);
-        res.status(500).json({ success: false, message: 'Something went wrong' });
-    }
-});
-
-// Get all contact messages (Admin)
-app.get('/api/contact', async (req, res) => {
-    try {
-        const messages = await Contact.find().sort({ createdAt: -1 });
-        res.json({ success: true, count: messages.length, data: messages });
-    } catch (err) {
-        console.error('❌ Fetch error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to fetch messages' });
-    }
-});
-
-// ===== START SERVER =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
