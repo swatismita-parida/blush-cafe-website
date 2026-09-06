@@ -93,7 +93,7 @@ lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.
 // ---------- Reservation form ----------
 const form = document.getElementById('reserveForm');
 const success = document.getElementById('formSuccess');
-const BACKEND_URL = 'http://127.0.0.1:5000';
+const BACKEND_URL = 'https://blush-cafe-website.onrender.com';
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
