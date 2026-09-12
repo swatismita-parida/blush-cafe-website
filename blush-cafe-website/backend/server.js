@@ -10,12 +10,16 @@ const app = express();
 
 // ===== MIDDLEWARE =====
 app.use(cors({
+<<<<<<< HEAD
     origin: [
         'http://localhost:5500',
         'http://127.0.0.1:5500',
         'https://wondrous-tartufo-155cbc.netlify.app',
         'https://blushcafe-swatismitaparida-fa740d.netlify.app'
     ],
+=======
+    origin: ['http://localhost:5500', 'https://wondrous-tartufo-155cbc.netlify.app', 'https://blushcafe-swatismitaparida-fa740d.netlify.app'],
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
     credentials: true
 }));
 app.use(express.json());

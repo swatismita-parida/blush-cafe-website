@@ -1,5 +1,6 @@
 # 🌸 Blush Café — Café Website
 
+<<<<<<< HEAD
 A modern, elegant, and responsive café website designed for a fictional café in **Saheed Nagar, Bhubaneswar, Odisha**.
 
 Blush Café uses a soft **baby-pink, cream, and deep rose** color palette with floral accents, real food photography, smooth animations, interactive cards, a gallery lightbox, reviews slider, interactive map, and an online table reservation system.
@@ -219,6 +220,41 @@ Bhubaneswar, Odisha
 Daily, 8:00 AM – 9:00 PM
 
 ---
+=======
+A modern and responsive café website created as part of the internship task.
+
+## ✨ Implemented
+
+* 🏠 Responsive home/hero section
+* ☕ Café favourites and menu
+* 🌸 About and weekly special sections
+* 🖼️ Gallery with lightbox
+* 💬 Customer reviews slider
+* 📍 Interactive location map
+* 📅 Table reservation form
+* 📱 Responsive mobile navigation
+* ✨ Smooth animations and 3D hover effects
+* ⬆️ Back-to-top and floating reservation button
+
+## 🛠️ Technologies
+
+* 🌐 HTML5
+* 🎨 CSS3
+* ⚡ JavaScript
+* ✨ GSAP & ScrollTrigger
+* 🗺️ Leaflet.js
+* 🟢 Node.js & Express.js
+* 🍃 MongoDB & Mongoose
+
+## 🔧 Backend
+
+The backend handles:
+
+* 📅 Table reservations
+* 📩 Contact form submissions
+* 🗄️ MongoDB data storage
+* ✅ Reservation validation
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
 
 ## 📂 Project Structure
 
@@ -229,6 +265,7 @@ blush-cafe-website/
 │   ├── index.html
 │   ├── style.css
 │   ├── script.js
+<<<<<<< HEAD
 │   │
 │   ├── logo.png
 │   ├── home1.png
@@ -242,10 +279,14 @@ blush-cafe-website/
 │   ├── berry iced tea.png
 │   ├── americano.png
 │   └── Ice-Rose.jpg
+=======
+│   └── assets/
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
 │
 ├── backend/
 │   ├── server.js
 │   ├── package.json
+<<<<<<< HEAD
 │   ├── package-lock.json
 │   ├── .env
 │   ├── .env.example
@@ -254,10 +295,15 @@ blush-cafe-website/
 │       └── models/
 │           ├── Contact.js
 │           └── Reservation.js
+=======
+│   └── src/
+│       └── models/
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
 │
 └── README.md
 ```
 
+<<<<<<< HEAD
 ---
 
 ## ⚙️ Backend API
@@ -343,11 +389,29 @@ npm run dev
 ```
 
 The backend runs on:
+=======
+## 🚀 How to Run
+
+### Frontend
+
+Open the `frontend` folder in VS Code and run `index.html` using Live Server.
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Backend runs on:
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
 
 ```text
 http://localhost:5000
 ```
 
+<<<<<<< HEAD
 ---
 
 ## 🗄️ Database
@@ -405,10 +469,16 @@ PORT=5000
 * ⚡ Node.js + Express backend
 
 ---
+=======
+## 🌐 Live Website
+
+https://blushcafe-swatismitaparida-fa740d.netlify.app
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
 
 ## 👩‍💻 Developer
 
 **Swatismita Parida**
+<<<<<<< HEAD
 Full-Stack Developer Intern
 **SuuSri AI**
 
@@ -425,3 +495,6 @@ This project is created for **educational, internship, and portfolio purposes**.
 © 2026 **Blush Café, Bhubaneswar**. All rights reserved.
 
 **Coffee, comfort & a little blush. 🌸☕**
+=======
+Full-Stack Developer Intern — SuuSri AI
+>>>>>>> 42e4e5a47c4453498060c9aba1f5b9ec63ed5898
