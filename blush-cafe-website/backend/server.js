@@ -16,9 +16,6 @@ app.use(cors({
         'https://wondrous-tartufo-155cbc.netlify.app',
         'https://blushcafe-swatismitaparida-fa740d.netlify.app'
     ],
-
-    origin: ['http://localhost:5500', 'https://wondrous-tartufo-155cbc.netlify.app', 'https://blushcafe-swatismitaparida-fa740d.netlify.app'],
-
     credentials: true
 }));
 app.use(express.json());
@@ -32,12 +29,6 @@ mongoose.connect(process.env.MONGO_URI)
 // ===== MODELS =====
 const Reservation = require('./src/models/Reservation');
 const Contact = require('./src/models/Contact');
-
-// ===== TEMP DIAGNOSTIC (remove after debugging) =====
-console.log('DEBUG SMTP_USER:', process.env.SMTP_USER);
-console.log('DEBUG SMTP_PASS length:', process.env.SMTP_PASS ? process.env.SMTP_PASS.length : 'undefined/empty');
-console.log('DEBUG SMTP_HOST:', process.env.SMTP_HOST);
-console.log('DEBUG SMTP_PORT:', process.env.SMTP_PORT);
 
 // ===== SMTP TRANSPORTER =====
 const transporter = nodemailer.createTransport({
@@ -119,14 +110,13 @@ app.post('/api/contact', async (req, res) => {
 
         try {
             await transporter.sendMail({
-                from: process.env.CONTACT_RECEIVER,
+                from: process.env.SMTP_USER,
                 to: process.env.CONTACT_RECEIVER,
                 replyTo: contact.email,
                 subject: `New Contact Form Enquiry — ${contact.subject}`,
                 text: `Name: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone || 'Not provided'}\n\nMessage:\n${contact.message}`
             });
         } catch (mailErr) {
-            // The enquiry is already saved even if the email fails — log it, don't fail the request
             console.error('⚠️ SMTP send failed:', mailErr.message);
         }
 
@@ -203,7 +193,7 @@ app.delete('/api/contact/:id', async (req, res) => {
 });
 
 // =====================================================
-// RESERVATIONS (unchanged from before)
+// RESERVATIONS
 // =====================================================
 
 app.post('/api/reservations', async (req, res) => {

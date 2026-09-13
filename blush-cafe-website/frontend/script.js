@@ -90,10 +90,11 @@ document.querySelectorAll('.gallery-item').forEach(item => {
 document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('open'); });
 
+// ---------- Backend URL ----------
+const BACKEND_URL = 'http://localhost:5000';
 // ---------- Reservation form ----------
 const form = document.getElementById('reserveForm');
 const success = document.getElementById('formSuccess');
-const BACKEND_URL = 'https://blush-cafe-website.onrender.com';
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -105,7 +106,6 @@ form.addEventListener('submit', async (e) => {
   submitBtn.textContent = 'Booking...';
 
   const formData = new FormData(form);
-  // "guests" is a range like "1–2" or "7+" — take the first number for the backend's numeric field
   const peopleCount = parseInt(formData.get('guests'), 10) || 1;
 
   const payload = {
@@ -143,6 +143,56 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+// ---------- Contact form (Urgent Cake / Party Inquiry + SMTP) ----------
+const contactForm = document.getElementById('contactForm');
+const contactSuccess = document.getElementById('contactSuccess');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!contactForm.checkValidity()) return;
+
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending ♡';
+
+    const formData = new FormData(contactForm);
+    const payload = {
+      name: formData.get('name'),
+      email: formData.get('email') || 'not-provided@blushcafe.local',
+      phone: formData.get('phone'),
+      subject: formData.get('subject') || 'Urgent Inquiry',
+      message: formData.get('message')
+    };
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        contactSuccess.textContent = '✅ Got it! We\'ll get back to you within a few hours.';
+        contactSuccess.classList.remove('hidden');
+        contactForm.reset();
+      } else {
+        contactSuccess.textContent = data.message || 'Something went wrong. Please try again.';
+        contactSuccess.classList.remove('hidden');
+      }
+    } catch (err) {
+      contactSuccess.textContent = "Couldn't reach the server. Please try again.";
+      contactSuccess.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      setTimeout(() => contactSuccess.classList.add('hidden'), 6000);
+    }
+  });
+}
+
 // ---------- Back to top ----------
 document.getElementById('backTop').addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -161,11 +211,10 @@ L.marker([20.2961, 85.8245])
     .openPopup();
 
 // ======================================================
-// 🟢 GSAP + ScrollTrigger Animations (Assignment ke liye)
+// 🟢 GSAP + ScrollTrigger Animations
 // ======================================================
 gsap.registerPlugin(ScrollTrigger);
 
-// Hero Entrance Animation
 gsap.from(".hero-inner", { 
   y: 80, 
   opacity: 0, 
@@ -173,7 +222,6 @@ gsap.from(".hero-inner", {
   ease: "power3.out" 
 });
 
-// GSAP Scroll Reveal for Sections (Smooth fading effect)
 gsap.utils.toArray('.reveal').forEach((elem) => {
   gsap.to(elem, {
     opacity: 1,
@@ -187,7 +235,6 @@ gsap.utils.toArray('.reveal').forEach((elem) => {
   });
 });
 
-// About Section Text Reveal (Stagger effect)
 gsap.from(".about-copy h2", {
   scrollTrigger: ".about-copy h2",
   y: 40,
@@ -196,7 +243,6 @@ gsap.from(".about-copy h2", {
   stagger: 0.2
 });
 
-// Gallery Items Fade In (Stagger)
 gsap.from(".gallery-item", {
   scrollTrigger: ".gallery-grid",
   y: 40,
@@ -205,7 +251,6 @@ gsap.from(".gallery-item", {
   stagger: 0.1
 });
 
-// Special Section Image Reveal
 gsap.from(".img-block.ib2 img", {
   scrollTrigger: ".img-block.ib2",
   scale: 0.8,
