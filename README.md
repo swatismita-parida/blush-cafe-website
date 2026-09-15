@@ -52,7 +52,7 @@ blush-cafe-website/
 ## 🌐 Live Website
 
 **Frontend:**
-https://blushcafe-swatismitaparida-fa740d.netlify.app
+https://blush-cafe-website.vercel.app
 
 **Backend:**
 https://blush-cafe-website.onrender.com
